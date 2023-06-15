@@ -2,30 +2,21 @@ package com.rclark.tutorialmod;
 
 import com.mojang.logging.LogUtils;
 import com.rclark.tutorialmod.block.ModBlocks;
+import com.rclark.tutorialmod.entity.ModEntities;
+import com.rclark.tutorialmod.entity.client.TigerRenderer;
 import com.rclark.tutorialmod.item.ModCreativeModeTabs;
 import com.rclark.tutorialmod.item.ModItems;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CreativeModeTabEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -39,8 +30,12 @@ public class TutorialMod {
     public TutorialMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        ModCreativeModeTabs.register(modEventBus);
+
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+
+        ModEntities.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
@@ -52,30 +47,93 @@ public class TutorialMod {
 
     }
 
-    private void addCreative(CreativeModeTabEvent.BuildContents event) {
-        if (event.getTab() == CreativeModeTabs.INGREDIENTS) {
+    @SubscribeEvent
+    public void buildContents(BuildCreativeModeTabContentsEvent event) {
+        // Add to ingredients tab
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.BLACK_OPAL);
-            event.accept(ModItems.RAW_BLACK_OPAL);
+            event.accept(ModItems.RAW_BLACK_OPAL); // Takes in an ItemLike, assumes block has registered item
         }
-        if (event.getTab() == CreativeModeTabs.BUILDING_BLOCKS) {
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModBlocks.BLACK_OPAL_BLOCK);
         }
-        if (event.getTab() == CreativeModeTabs.NATURAL_BLOCKS) {
+        if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
             event.accept(ModBlocks.BLACK_OPAL_ORE);
             event.accept(ModBlocks.DEEPSLATE_BLACK_OPAL_ORE);
             event.accept(ModBlocks.NETHERRACK_BLACK_OPAL_ORE);
             event.accept(ModBlocks.ENDSTONE_BLACK_OPAL_ORE);
+
+            event.accept(ModBlocks.EBONY_LOG);
+            event.accept(ModBlocks.EBONY_WOOD);
+            event.accept(ModBlocks.STRIPPED_EBONY_LOG);
+            event.accept(ModBlocks.STRIPPED_EBONY_WOOD);
+            event.accept(ModBlocks.EBONY_PLANKS);
+            event.accept(ModBlocks.EBONY_SAPLING);
+            event.accept(ModBlocks.EBONY_LEAVES);
         }
-        if (event.getTab() == ModCreativeModeTabs.TUTORIAL_TAB) {
+        if (event.getTab() == ModCreativeModeTabs.TUTORIAL_TAB.get()) {
             event.accept(ModItems.BLACK_OPAL);
             event.accept(ModItems.RAW_BLACK_OPAL);
 
             event.accept(ModBlocks.BLACK_OPAL_BLOCK);
+            event.accept(ModItems.TIGER_SPAWN_EGG);
 
             event.accept(ModBlocks.BLACK_OPAL_ORE);
             event.accept(ModBlocks.DEEPSLATE_BLACK_OPAL_ORE);
             event.accept(ModBlocks.NETHERRACK_BLACK_OPAL_ORE);
             event.accept(ModBlocks.ENDSTONE_BLACK_OPAL_ORE);
+
+            event.accept(ModBlocks.EBONY_LOG);
+            event.accept(ModBlocks.EBONY_WOOD);
+            event.accept(ModBlocks.STRIPPED_EBONY_LOG);
+            event.accept(ModBlocks.STRIPPED_EBONY_WOOD);
+            event.accept(ModBlocks.EBONY_PLANKS);
+            event.accept(ModBlocks.EBONY_SAPLING);
+            event.accept(ModBlocks.EBONY_LEAVES);
+        }
+    }
+
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ModItems.BLACK_OPAL);
+            event.accept(ModItems.RAW_BLACK_OPAL);
+        }
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModBlocks.BLACK_OPAL_BLOCK);
+        }
+        if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            event.accept(ModBlocks.BLACK_OPAL_ORE);
+            event.accept(ModBlocks.DEEPSLATE_BLACK_OPAL_ORE);
+            event.accept(ModBlocks.NETHERRACK_BLACK_OPAL_ORE);
+            event.accept(ModBlocks.ENDSTONE_BLACK_OPAL_ORE);
+
+            event.accept(ModBlocks.EBONY_LOG);
+            event.accept(ModBlocks.EBONY_WOOD);
+            event.accept(ModBlocks.STRIPPED_EBONY_LOG);
+            event.accept(ModBlocks.STRIPPED_EBONY_WOOD);
+            event.accept(ModBlocks.EBONY_PLANKS);
+            event.accept(ModBlocks.EBONY_SAPLING);
+            event.accept(ModBlocks.EBONY_LEAVES);
+        }
+        if (event.getTab() == ModCreativeModeTabs.TUTORIAL_TAB.get()) {
+            event.accept(ModItems.BLACK_OPAL);
+            event.accept(ModItems.RAW_BLACK_OPAL);
+
+            event.accept(ModBlocks.BLACK_OPAL_BLOCK);
+            event.accept(ModItems.TIGER_SPAWN_EGG);
+
+            event.accept(ModBlocks.BLACK_OPAL_ORE);
+            event.accept(ModBlocks.DEEPSLATE_BLACK_OPAL_ORE);
+            event.accept(ModBlocks.NETHERRACK_BLACK_OPAL_ORE);
+            event.accept(ModBlocks.ENDSTONE_BLACK_OPAL_ORE);
+
+            event.accept(ModBlocks.EBONY_LOG);
+            event.accept(ModBlocks.EBONY_WOOD);
+            event.accept(ModBlocks.STRIPPED_EBONY_LOG);
+            event.accept(ModBlocks.STRIPPED_EBONY_WOOD);
+            event.accept(ModBlocks.EBONY_PLANKS);
+            event.accept(ModBlocks.EBONY_SAPLING);
+            event.accept(ModBlocks.EBONY_LEAVES);
         }
     }
 
@@ -84,7 +142,7 @@ public class TutorialMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-
+            EntityRenderers.register(ModEntities.TIGER.get(), TigerRenderer::new);
         }
     }
 }
